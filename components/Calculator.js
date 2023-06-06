@@ -1,66 +1,37 @@
-import React, { useState } from "react";
-
-// TODO: start coding here!
+import React, { useRef } from 'react';
 
 const Calculator = () => {
-  const [billAmount, setBillAmount] = useState(0);
-  const [tipPercentage, setTipPercentage] = useState(0);
-  const [numberOfPeople, setNumberOfPeople] = useState(0);
-  const [tipAmount, setTipAmount] = useState(0);
-  const [tipInput, settipInput] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const billAmountRef = useRef(null);
+  const tipPercentageRef = useRef(null);
+  const numberOfPeopleRef = useRef(null);
 
-  // Function to calculate the tip amount and total price
-  const calculateTipAndTotal = () => {
-    const bill = parseFloat(billAmount);
-    const tipPercent = parseFloat(tipPercentage);
-    const people = parseFloat(numberOfPeople);
-    const tipValue = parseFloat(tipInput);
+  const tipAmountRef = useRef(null);
+  const totalPriceRef = useRef(null);
+
+  const handleCalculate = () => {
+    const bill = parseFloat(billAmountRef.current.value);
+    const tipPercent = parseFloat(tipPercentageRef.current.value);
+    const people = parseFloat(numberOfPeopleRef.current.value);
+
     if (bill && tipPercent && people) {
       const tip = (bill * tipPercent) / 100;
       const total = (bill + tip) / people;
-      setTipAmount(tip);
-      setTotalPrice(total);
-    } else if (bill && tipValue && people) {
-      const tip = (bill * tipValue) / 100;
-      const total = (bill + tip) / people;
-      setTipAmount(tip);
-      setTotalPrice(total);
+
+      tipAmountRef.current.textContent = `$${tip.toFixed(2)}`;
+      totalPriceRef.current.textContent = `$${total.toFixed(2)}`;
     } else {
-      setTipAmount(0);
-      setTotalPrice(0);
+      tipAmountRef.current.textContent = '$0.00';
+      totalPriceRef.current.textContent = '$0.00';
     }
   };
 
-  // Function to handle changes in bill amount
-  const handleBillAmountChange = (event) => {
-    setBillAmount(event.target.value);
-    calculateTipAndTotal();
-  };
-
-  const handleTipPercentageChange = (percentage) => {
-    setTipPercentage(percentage);
-    calculateTipAndTotal();
-  };
-  const handleTipInput = (event) => {
-    settipInput(event.target.value);
-    calculateTipAndTotal();
-  };
-
-  // Function to handle changes in number of people
-  const handleNumberOfPeopleChange = (event) => {
-    setNumberOfPeople(event.target.value);
-    calculateTipAndTotal();
-  };
-
-  // Function to handle reset button click
   const handleReset = () => {
-    setBillAmount(0);
-    setTipPercentage(0);
-    setNumberOfPeople(0);
-    setTipAmount(0);
-    setTotalPrice(0);
-    settipInput(0);
+    billAmountRef.current.value = '';
+    tipPercentageRef.current.value = '';
+    numberOfPeopleRef.current.value = '';
+
+    tipAmountRef.current.textContent = '$0.00';
+    totalPriceRef.current.textContent = '$0.00';
   };
 
   return (
@@ -87,8 +58,8 @@ const Calculator = () => {
               placeholder="0"
               name="Total bill value"
               id="totalBill"
-              value={billAmount}
-              onChange={handleBillAmountChange}
+              ref={billAmountRef}
+              onChange={handleCalculate}
             />
           </div>
 
@@ -106,46 +77,60 @@ const Calculator = () => {
               <button
                 className="body-l-text input-tip"
                 id="tip5"
-                onClick={() => handleTipPercentageChange(5)}
+                onClick={() => {
+                  tipPercentageRef.current.value = '5';
+                  handleCalculate();
+                }}
               >
                 5%
               </button>
               <button
                 className="body-l-text input-tip"
                 id="tip10"
-                onClick={() => handleTipPercentageChange(10)}
+                onClick={() => {
+                  tipPercentageRef.current.value = '10';
+                  handleCalculate();
+                }}
               >
                 10%
               </button>
               <button
                 className="body-l-text input-tip"
                 id="tip15"
-                onClick={() => handleTipPercentageChange(15)}
+                onClick={() => {
+                  tipPercentageRef.current.value = '15';
+                  handleCalculate();
+                }}
               >
                 15%
               </button>
               <button
                 className="body-l-text input-tip"
                 id="tip25"
-                onClick={() => handleTipPercentageChange(25)}
+                onClick={() => {
+                  tipPercentageRef.current.value = '25';
+                  handleCalculate();
+                }}
               >
                 25%
               </button>
               <button
                 className="body-l-text input-tip"
                 id="tip50"
-                onClick={() => handleTipPercentageChange(50)}
+                onClick={() => {
+                  tipPercentageRef.current.value = '50';
+                  handleCalculate();
+                }}
               >
                 50%
               </button>
-
               <input
                 type="number"
                 className="body-l-text input-field"
                 placeholder="Custom"
                 id="totalTipPercentage"
-                value={tipInput}
-                onChange={handleTipInput}
+                ref={tipPercentageRef}
+                onChange={handleCalculate}
               />
             </div>
           </div>
@@ -165,8 +150,8 @@ const Calculator = () => {
               placeholder="0"
               name="Number of people"
               id="numberOfPeople"
-              value={numberOfPeople}
-              onChange={handleNumberOfPeopleChange}
+              ref={numberOfPeopleRef}
+              onChange={handleCalculate}
             />
           </div>
         </div>
@@ -176,8 +161,12 @@ const Calculator = () => {
               <b className="body-text card-price-title">Tip Amount</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="tipAmount">
-              ${tipAmount.toFixed(2)}
+            <strong
+              className="strong-text card-price-value"
+              id="tipAmount"
+              ref={tipAmountRef}
+            >
+              $0.00
             </strong>
           </section>
           <section className="card-price-container">
@@ -185,8 +174,12 @@ const Calculator = () => {
               <b className="body-text card-price-title">Total</b>
               <p className="body-s-text card-price-subtitle">/ person</p>
             </div>
-            <strong className="strong-text card-price-value" id="totalPrice">
-              ${totalPrice.toFixed(2)}
+            <strong
+              className="strong-text card-price-value"
+              id="totalPrice"
+              ref={totalPriceRef}
+            >
+              $0.00
             </strong>
           </section>
           <button className="btn btn-primary btn-reset" onClick={handleReset}>
